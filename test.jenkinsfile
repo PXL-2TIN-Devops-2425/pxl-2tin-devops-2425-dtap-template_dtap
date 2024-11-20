@@ -4,7 +4,18 @@ pipeline {
     stages {
         stage ('cleanup'){
             steps{
-                // TODO
+                 script {
+                    // Clean the working directory
+                    deleteDir()
+                }
+            }
+        }
+        stage ('Install dependencies'){
+            steps{
+                    script {
+                    // Run npm install with the configured Node.js version
+                    sh 'npm install'
+                }
             }
         }
         stage('fetch app code') {
