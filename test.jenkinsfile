@@ -2,14 +2,6 @@ pipeline {
     agent any
   
     stages {
-        stage ('cleanup'){
-            steps{
-                 script {
-                    echo 'Cleaning up...'
-                    cleanWs()
-                }
-            }
-        }
         stage ('Install dependencies'){
             steps{
             	echo 'Run npm install with the configured Node.js version'
@@ -24,5 +16,12 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/PXL-2TIN-DevOps-Resources/calculator-app-finished.git'
             }
         }
+    }
+    
+    post{
+    	always{
+    	    echo 'Cleaning up after'
+    	    cleanWs()
+    	}
     }
 }
