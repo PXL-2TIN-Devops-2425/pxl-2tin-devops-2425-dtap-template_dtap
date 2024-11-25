@@ -1,5 +1,10 @@
 pipeline {
     agent any
+    
+    environment{
+    	IMAGE_NAME = 'calculator-final-app-eepy'
+    	IMAGE_TAG = 'latest'
+    }
   
     stages {
         stage ('Install dependencies'){
@@ -14,6 +19,11 @@ pipeline {
             steps {
                 echo 'Get some code from a GitHub repository'
                 git branch: 'main', url: 'https://github.com/PXL-2TIN-DevOps-Resources/calculator-app-finished.git'
+            }
+        }
+        stage('Build artifact') {
+            steps {
+            	def customImage = docker.build('${IMAGE_NAME}:${IMAGE_TAG}')
             }
         }
     }
