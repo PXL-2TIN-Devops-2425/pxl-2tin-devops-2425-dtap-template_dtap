@@ -12,10 +12,10 @@ pipeline {
         }
         stage ('Install dependencies'){
             steps{
-                    script {
-                    echo 'Run npm install with the configured Node.js version'
-                    sh 'npm install'
-                }
+            	echo 'Run npm install with the configured Node.js version'
+            	nodejs('testenvnode'){
+            		sh 'npm install'
+            	}
             }
         }
         stage('fetch app code') {
