@@ -5,22 +5,22 @@ pipeline {
         stage ('cleanup'){
             steps{
                  script {
-                    // Clean the working directory
-                    deleteDir()
+                    echo 'Cleaning up...'
+                    cleanWs()
                 }
             }
         }
         stage ('Install dependencies'){
             steps{
                     script {
-                    // Run npm install with the configured Node.js version
+                    echo 'Run npm install with the configured Node.js version'
                     sh 'npm install'
                 }
             }
         }
         stage('fetch app code') {
             steps {
-                // Get some code from a GitHub repository
+                echo 'Get some code from a GitHub repository'
                 git branch: 'main', url: 'https://github.com/PXL-2TIN-DevOps-Resources/calculator-app-finished.git'
             }
         }
