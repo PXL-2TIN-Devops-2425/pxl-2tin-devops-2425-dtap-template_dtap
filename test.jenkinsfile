@@ -12,8 +12,8 @@ pipeline {
     stages {
         stage("Stopping and deleting all running docker containers"){
             steps{
-                docker stop $(docker ps -a -q)
-                docker rm $(docker ps -a -q)
+                sh 'docker stop $(docker ps -a -q)'
+                sh 'docker rm $(docker ps -a -q)'
             }
         }
         stage ("Install dependencies"){
