@@ -27,7 +27,7 @@ pipeline {
         stage('Build artifact') {
             steps{
                 script{
-                    CUSTOM_IMAGE = docker.build("${IMAGE_NAME}:${IMAGE_TAG}")
+                    CUSTOM_IMAGE = docker.build("${DOCKER_HUB_REPO}:${IMAGE_TAG}")
                 }
             }
         }
