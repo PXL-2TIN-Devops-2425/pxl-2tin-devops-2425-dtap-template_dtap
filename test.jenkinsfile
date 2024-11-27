@@ -22,9 +22,10 @@ pipeline {
             }
         }
         stage('Build artifact') {
-            agent { dockerfile true }
-            steps {
-                sh 'npm --version'
+            steps{
+                script{
+                    def customImage = docker.build('calculator-final-app-eepy:latest')
+                }
             }
         }
     }
