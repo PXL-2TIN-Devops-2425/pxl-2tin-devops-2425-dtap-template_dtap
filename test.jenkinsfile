@@ -1,10 +1,11 @@
 pipeline {
     agent any
     
-    //environment{
-    //	IMAGE_NAME = 'calculator-final-app-eepy'
-    //	IMAGE_TAG = 'latest'
-    //}
+    environment{
+    	IMAGE_NAME = 'calculator-final-app-eepy'
+    	IMAGE_TAG = 'latest'
+    	DOCKER_HUB_REPO = 'anatolisafonov/${IMAGE_NAME}'
+    }
   
     stages {
         stage ('Install dependencies'){
@@ -24,7 +25,14 @@ pipeline {
         stage('Build artifact') {
             steps{
                 script{
-                    def customImage = docker.build('calculator-final-app-eepy:latest')
+                    def customImage = docker.build('${IMAGE_NAME}:${IMAGE_TAG}')
+                }
+            }
+        }
+        stage('Push artifact'){
+            steps{
+                script{
+                    customImage.push()
                 }
             }
         }
