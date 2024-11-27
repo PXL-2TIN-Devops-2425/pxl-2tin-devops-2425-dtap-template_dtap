@@ -43,7 +43,7 @@ pipeline {
         stage("Deployment"){
             steps{
                 script{
-                    docker.image("${DOCKER_HUB_REPO}:${IMAGE_TAG}").withRun("-p 3000:3000")
+                    docker.image("${DOCKER_HUB_REPO}:${IMAGE_TAG}").run("-p 3000:3000")
                 }
             }
         }
