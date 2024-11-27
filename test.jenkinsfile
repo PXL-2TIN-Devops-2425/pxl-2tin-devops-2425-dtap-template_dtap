@@ -2,39 +2,39 @@ pipeline {
     agent any
     
     environment{
-    	IMAGE_NAME = 'calculator-final-app-eepy'
-    	IMAGE_TAG = 'latest'
-    	DOCKER_HUB_REPO = 'anatolisafonov/${IMAGE_NAME}'
-    	DOCKER_CREDENTIALS = 'dockerhub-creds'
-    	CUSTOM_IMAGE = ''
+    	IMAGE_NAME = "calculator-final-app-eepy"
+    	IMAGE_TAG = "latest"
+    	DOCKER_HUB_REPO = "anatolisafonov/${IMAGE_NAME}"
+    	DOCKER_CREDENTIALS = "dockerhub-creds"
+    	CUSTOM_IMAGE = ""
     }
   
     stages {
-        stage ('Install dependencies'){
+        stage ("Install dependencies"){
             steps{
-            	echo 'Run npm install with the configured Node.js version'
-            	nodejs('testenvnode'){
-            		sh 'npm install'
+            	echo "Run npm install with the configured Node.js version"
+            	nodejs("testenvnode"){
+            		sh "npm install"
             	}
             }
         }
-        stage('fetch app code') {
+        stage("fetch app code") {
             steps {
-                echo 'Get some code from a GitHub repository'
-                git branch: 'main', url: 'https://github.com/PXL-2TIN-DevOps-Resources/calculator-app-finished.git'
+                echo "Get some code from a GitHub repository"
+                git branch: "main", url: "https://github.com/PXL-2TIN-DevOps-Resources/calculator-app-finished.git"
             }
         }
-        stage('Build artifact') {
+        stage("Build artifact") {
             steps{
                 script{
                     CUSTOM_IMAGE = docker.build("${DOCKER_HUB_REPO}:${IMAGE_TAG}")
                 }
             }
         }
-        stage('Push artifact'){
+        stage("Push artifact"){
             steps{
                 script{
-                    docker.withRegistry('https://index.docker.io/v1/', DOCKER_CREDENTIALS){
+                    docker.withRegistry("https://index.docker.io/v1/", DOCKER_CREDENTIALS){
                     	CUSTOM_IMAGE.push()
                     }
                 }
@@ -44,7 +44,7 @@ pipeline {
     
     post{
     	always{
-    	    echo 'Cleaning up after'
+    	    echo "Cleaning up after"
     	    cleanWs()
     	}
     }
