@@ -5,6 +5,7 @@ pipeline {
     	IMAGE_NAME = 'calculator-final-app-eepy'
     	IMAGE_TAG = 'latest'
     	DOCKER_HUB_REPO = 'anatolisafonov/${IMAGE_NAME}'
+    	DOCKER_CREDENTIALS = 'dockerhub-creds'
     }
   
     stages {
@@ -32,6 +33,7 @@ pipeline {
         stage('Push artifact'){
             steps{
                 script{
+                    docker.withRegistry('', DOCKER_CREDENTIALS)
                     customImage.push()
                 }
             }
