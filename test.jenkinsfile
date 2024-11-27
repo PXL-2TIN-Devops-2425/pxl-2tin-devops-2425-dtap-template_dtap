@@ -22,8 +22,9 @@ pipeline {
             }
         }
         stage('Build artifact') {
+            agent { dockerfile true }
             steps {
-                agent { dockerfile true }
+                sh 'npm --version'
             }
         }
     }
