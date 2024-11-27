@@ -21,11 +21,11 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/PXL-2TIN-DevOps-Resources/calculator-app-finished.git'
             }
         }
-        //stage('Build artifact') {
-        //    steps {
-        //    	def customImage = docker.build('calculator-final-app-eepy:latest')
-        //    }
-        //}
+        stage('Build artifact') {
+            steps {
+            	def customImage = docker.build('calculator-final-app-eepy:latest')
+            }
+        }
     }
     
     post{
