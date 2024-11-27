@@ -6,6 +6,7 @@ pipeline {
     	IMAGE_TAG = 'latest'
     	DOCKER_HUB_REPO = 'anatolisafonov/${IMAGE_NAME}'
     	DOCKER_CREDENTIALS = 'dockerhub-creds'
+    	CUSTOM_IMAGE = ''
     }
   
     stages {
@@ -26,7 +27,7 @@ pipeline {
         stage('Build artifact') {
             steps{
                 script{
-                    def customImage = docker.build("${IMAGE_NAME}:${IMAGE_TAG}")
+                    CUSTOM_IMAGE = docker.build("${IMAGE_NAME}:${IMAGE_TAG}")
                 }
             }
         }
@@ -34,7 +35,7 @@ pipeline {
             steps{
                 script{
                     docker.withRegistry('https://index.docker.io/v1/', DOCKER_CREDENTIALS){
-                    	customImage.push()
+                    	CUSTOM_IMAGE.push()
                     }
                 }
             }
