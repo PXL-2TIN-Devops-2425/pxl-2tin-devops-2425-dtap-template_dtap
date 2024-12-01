@@ -1,10 +1,29 @@
 pipeline {
     agent any
     stages {
-        stage('dtap production') {
+        stage('deploy prod') {
             steps {
-                echo "good luck..."
+                //alles tussen "<>" moet nog ingevuld worden!
+                sh '''
+                    ssh -i "devopskey" ec2-user@<ip-adres>
+                    docker pull <image-name>
+                    docker run -d --name <container-name> -p 80:3000 <image-name>
+                '''
             }
+        }
+        stage('start prod'){
+            steps{
+                //voorzie nog nodige cleanups!!
+                sh 'systemctl start'
+                
+            }
+        }
+        stage('test prod'){
+            steps{
+                //curl naar de applicatie om te kijken of die werkt(status 200)
+                sh 'curl -I <ip-adress server>'
+            }
+            
         }
     }
 }
