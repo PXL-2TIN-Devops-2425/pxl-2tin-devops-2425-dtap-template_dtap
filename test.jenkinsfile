@@ -3,7 +3,6 @@ pipeline {
     tools {
         nodejs "TINnode-devops"
     }
-  
     stages {
         stage ('cleanup'){
             steps{
