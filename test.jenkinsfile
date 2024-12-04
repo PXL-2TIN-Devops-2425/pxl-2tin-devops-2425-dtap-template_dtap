@@ -32,7 +32,7 @@ pipeline {
         stage('build artifact'){
             steps{
                 sh 'docker build . -t test'
-                sh 'docker run test'
+                sh 'docker push jester01/test'
             }
         }
     }
