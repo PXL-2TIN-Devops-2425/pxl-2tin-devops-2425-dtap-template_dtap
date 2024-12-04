@@ -32,7 +32,7 @@ pipeline {
         stage('build artifact'){
             steps{
                 sh 'docker build . -t jester01/test:latest'
-                sh 'ddocker images'
+                sh 'docker images'
             }
         }
         stage('push artifact'){
