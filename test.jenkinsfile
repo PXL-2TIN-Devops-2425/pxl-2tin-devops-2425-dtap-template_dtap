@@ -31,13 +31,13 @@ pipeline {
      
         stage('build artifact'){
             steps{
-                sh 'docker build . -t jester01/test'
+                sh 'docker build . -t jester01/test:0.0.1'
                
             }
         }
         stage('push artifact'){
             steps{
-                 sh 'docker push jester01/test'
+                 sh 'docker push jester01/test:0.0.1'
             
             }
         }
