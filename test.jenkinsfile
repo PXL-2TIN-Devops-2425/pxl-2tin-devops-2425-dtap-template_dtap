@@ -1,5 +1,9 @@
 pipeline {
     agent any
+    environment{
+        DOCKER_USER = credentials('DOCKER_USERNAME')
+        DOCKER_PASWORD = credentials('DOCKER_WACHTWOORD')
+    }
 
     tools {
         nodejs "TINnode-devops"
@@ -31,7 +35,7 @@ pipeline {
      
         stage('build artifact'){
             steps{
-                sh 'docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWOORD" docker.io'
+                sh 'docker login -u "$DOCKER_USER" -p "$DOCKER_PASWORD" docker.io'
                 sh 'docker build . -t jester01/test:latest'
                 sh 'docker images'
             }
