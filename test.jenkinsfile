@@ -22,10 +22,16 @@ pipeline {
                 sh 'npm install'
             }
         }
+        stage('unittest'){
+            steps{
+                sh 'npm test'
+                junit '**/junit.xml'
+            }
+        }
      
         stage('build artifact'){
             steps{
-                sh 'docker build . -t etst'
+                sh 'docker build . -t test'
             }
         }
     }
