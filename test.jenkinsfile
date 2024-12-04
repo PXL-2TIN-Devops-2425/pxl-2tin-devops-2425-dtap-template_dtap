@@ -45,7 +45,7 @@ pipeline {
             steps {
                 sh 'docker rm -vf $(docker ps -aq)'
                 sh 'docker rmi -f $(docker images -aq)'
-                sh 'docker run -d -p 3000:8080 jester01/test:latest'
+                sh 'docker run -d -p 3000:3000 jester01/test:latest'
             }
         }
     }
