@@ -3,7 +3,7 @@ pipeline {
     agent any
 
       environment {
-        DOCKERHUB_CREDENTIALS = credentials('devops_docker')
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
       }
 
         tools{
@@ -14,7 +14,6 @@ pipeline {
         stage('cleanup') {
 
             steps {
-
                cleanWs()
 
            }
@@ -24,10 +23,16 @@ pipeline {
         stage('fetch app code') {
             steps {
                 // Get some code from a GitHub repository
-                git branch: 'main', credentialsId:'devops', url: 'git@github.com:PXL-2TIN-Devops-2425/calculator-app-finished-2TIN-deploymates.git'
+                git branch: 'main', credentialsId:'DevOpsCI', url: 'git@github.com:PXL-2TIN-Devops-2425/calculator-app-finished-2TIN-deploymates.git'
             }
         }
-
+         stage('Install dependencies') {
+            steps {
+                sh '''
+                    npm install
+                '''
+            }
+        }
         stage('Setting up for docker'){
             steps{
                 sh '''
@@ -62,11 +67,20 @@ pipeline {
                 sh 'docker push $DOCKERHUB_CREDENTIALS_USR/calculator:latest'
             }
         }
-
-
-
-
-
+        stage('deployment') {
+    steps {
+        sh '''
+            container_id=$(docker ps -aq -f name=calculator-app)
+            
+            if [ -n "$container_id" ]; then
+                docker stop calculator-app || true
+                docker rm calculator-app || true
+            fi
+            
+            docker run -d --name calculator-app -p 3000:3000 $DOCKERHUB_CREDENTIALS_USR/calculator:latest
+        '''
+    }
+}
     }
 
     post{
@@ -77,3 +91,7 @@ pipeline {
 
 
 }
+
+
+
+
