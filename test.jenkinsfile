@@ -28,5 +28,10 @@ pipeline {
                 junit '**/junit.xml'
             }
         }
+        stage('build artifact'){
+            steps{
+                sh 'docker build -t test'
+            }
+        }
     }
 }
