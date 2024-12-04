@@ -31,6 +31,7 @@ pipeline {
      
         stage('build artifact'){
             steps{
+                sh 'docker login -u "jester01" -p "IanAnouk1" docker.io'
                 sh 'docker build . -t jester01/test:latest'
                 sh 'docker images'
             }
