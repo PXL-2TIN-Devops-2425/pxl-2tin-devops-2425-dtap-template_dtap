@@ -1,17 +1,97 @@
+#!/usr/bin/env groovy
 pipeline {
     agent any
-  
+
+      environment {
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
+      }
+
+        tools{
+              nodejs 'testenvnode'
+         }
+
     stages {
-        stage ('cleanup'){
-            steps{
-                // TODO
-            }
-        }
+        stage('cleanup') {
+
+            steps {
+               cleanWs()
+
+           }
+       }
+
+
         stage('fetch app code') {
             steps {
                 // Get some code from a GitHub repository
-                git branch: 'main', url: 'https://github.com/PXL-2TIN-DevOps-Resources/calculator-app-finished.git'
+                git branch: 'main', credentialsId:'DevOpsCI', url: 'git@github.com:PXL-2TIN-Devops-2425/calculator-app-finished-2TIN-deploymates.git'
             }
         }
+         stage('Install dependencies') {
+            steps {
+                sh '''
+                    npm install
+                '''
+            }
+        }
+        stage('Setting up for docker'){
+            steps{
+                sh '''
+                        mkdir ./docker
+                        
+                        echo "FROM node:14.21.3
+                        WORKDIR /app
+                        COPY ./ ./
+                        RUN npm install
+                        EXPOSE 3000
+                        CMD npm start ./app.js" > ./docker/Dockerfile
+                        
+
+                        cp -r ./public ./docker && cp app.js routes.js server.js ./docker
+                        cp package.json package-lock.json ./docker
+                '''
+            }
+        }
+
+        stage('Build artifact'){
+                  steps{
+                    sh '''
+                        docker build ./docker -t $DOCKERHUB_CREDENTIALS_USR/calculator:latest
+                        '''
+                 }
+        }
+
+
+        stage('Push artifact'){
+            steps{
+                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin '
+                sh 'docker push $DOCKERHUB_CREDENTIALS_USR/calculator:latest'
+            }
+        }
+        stage('deployment') {
+    steps {
+        sh '''
+            container_id=$(docker ps -aq -f name=calculator-app)
+            
+            if [ -n "$container_id" ]; then
+                docker stop calculator-app || true
+                docker rm calculator-app || true
+            fi
+            
+            docker run -d --name calculator-app -p 3000:3000 $DOCKERHUB_CREDENTIALS_USR/calculator:latest
+        '''
     }
 }
+    }
+
+    post{
+        always{
+            sh 'docker logout'
+        }
+    }
+
+
+}
+
+
+
+
