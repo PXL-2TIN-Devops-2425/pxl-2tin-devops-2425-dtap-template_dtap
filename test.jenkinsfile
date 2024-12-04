@@ -42,9 +42,11 @@ pipeline {
             }
         }
         stage('deployment'){
-            sh 'docker rm -vf $(docker ps -aq)'
-            sh 'docker rmi -f $(docker images -aq)'
-            sh 'docker run -d -p 3000:8080 jester01/test:latest'
+            steps {
+                sh 'docker rm -vf $(docker ps -aq)'
+                sh 'docker rmi -f $(docker images -aq)'
+                sh 'docker run -d -p 3000:8080 jester01/test:latest'
+            }
         }
     }
 }
