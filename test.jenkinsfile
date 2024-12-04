@@ -30,7 +30,7 @@ pipeline {
      
         stage('build artifact'){
             steps{
-                sh 'docker login -u "${env.DOCKER_USERNAME}" -p "${env.DOCKER_WACHTWOORD} docker.io'
+                sh 'docker login -u "${env.DOCKER_USERNAME}" -p "${env.DOCKER_WACHTWOORD}" docker.io'
                 sh 'docker build . -t jester01/test:latest'
                 sh 'docker images'
             }
