@@ -1,0 +1,69 @@
+#!/usr/bin/env groovy
+pipeline {
+    agent any
+
+    environment {
+        SERVER_IP = '54.90.179.147' // IP-adres van de productieserver
+        DOCKER_IMAGE = 'theinstant/calculator' // Docker image van de applicatie
+        SSH_CREDENTIALS = 'devops_aws' // Jenkins credentials ID voor SSH-authenticatie
+    }
+
+    stages {
+        stage('cleanup') {
+            steps {
+                cleanWs()
+            }
+        }
+
+        stage('Deploy prod') {
+            steps {
+                sshagent(credentials: [SSH_CREDENTIALS]) {
+                    script {
+                        // Download de nieuwste versie van de Docker-container vanaf Docker Hub
+                        sh "ssh ec2-user@${SERVER_IP} 'docker pull ${DOCKER_IMAGE}'"
+                    }
+                }
+            }
+        }
+
+        stage('Start prod') {
+            steps {
+                sshagent(credentials: [SSH_CREDENTIALS]) {
+                    script {
+                        // Verwijder de bestaande container (indien aanwezig)
+                        sh """
+                            ssh ec2-user@${SERVER_IP} '
+                                if [ "$(docker ps -q -f name=calculator)" ]; then
+                                    docker stop calculator && docker rm calculator
+                                fi
+                            '
+                        """
+                        // Start de nieuwe container op poort 80
+                        sh "ssh ec2-user@${SERVER_IP} 'docker run -dt --name calculator -p 80:3000 ${DOCKER_IMAGE}'"
+                    }
+                }
+            }
+        }
+
+        stage('Test prod') {
+            steps {
+                script {
+                    // Controleer of de applicatie werkt door een HTTP-statuscode van 200 te ontvangen
+                    def statusCode = sh(script: "curl -o /dev/null -s -w '%{http_code}' http://${SERVER_IP}", returnStdout: true).trim()
+                    if (statusCode == '200') {
+                        echo 'Application is running successfully on production server.'
+                    } else {
+                        error "Application failed to start. HTTP Status Code: ${statusCode}"
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline completed.'
+        }
+    }
+}
+
