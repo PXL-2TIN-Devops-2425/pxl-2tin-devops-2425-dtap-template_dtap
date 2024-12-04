@@ -25,7 +25,7 @@ pipeline {
      
         stage('build artifact'){
             steps{
-                sh 'ls'
+                sh 'docker build .  -t test'
             }
         }
     }
