@@ -3,9 +3,9 @@ pipeline {
     agent any
 
     environment {
-        SERVER_IP = '54.90.179.147' // IP-adres van de productieserver
-        DOCKER_IMAGE = 'theinstant/calculator' // Docker image van de applicatie
-        SSH_CREDENTIALS = 'devops_aws' // Jenkins credentials ID voor SSH-authenticatie
+        SERVER_IP = '[IP-ADDRESS]' // IP-adres van de productieserver
+        DOCKER_IMAGE = '[IMAGE NAME]' // Docker image van de applicatie
+        SSH_CREDENTIALS = '[SSH-KEY-NAME]' // Jenkins credentials ID voor SSH-authenticatie
     }
 
     stages {

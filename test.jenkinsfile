@@ -3,11 +3,11 @@ pipeline {
     agent any
 
       environment {
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
+        DOCKERHUB_CREDENTIALS = credentials('[DOKCER CREDS]')
       }
 
         tools{
-              nodejs 'testenvnode'
+              nodejs '[NAME NODE VERSION]'
          }
 
     stages {
@@ -23,7 +23,7 @@ pipeline {
         stage('fetch app code') {
             steps {
                 // Get some code from a GitHub repository
-                git branch: 'main', credentialsId:'DevOpsCI', url: 'git@github.com:PXL-2TIN-Devops-2425/calculator-app-finished-2TIN-deploymates.git'
+                git branch: 'main', credentialsId:'[GIT KEY]', url: 'git@github.com:PXL-2TIN-Devops-2425/calculator-app-finished-2TIN-deploymates.git'
             }
         }
          stage('Install dependencies') {
