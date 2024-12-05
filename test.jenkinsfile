@@ -1,17 +1,72 @@
 pipeline {
     agent any
-  
+    tools {
+        nodejs 'testenvnode'
+    }
+    environment {
+        DOCKER_CRED = credentials("dockerhub_credentials")
+        IMAGE_NAME = "mathijsdewilde/calculatorapp"
+    }
     stages {
         stage ('cleanup'){
             steps{
-                // TODO
+                cleanWs()
             }
         }
         stage('fetch app code') {
             steps {
-                // Get some code from a GitHub repository
                 git branch: 'main', url: 'https://github.com/PXL-2TIN-DevOps-Resources/calculator-app-finished.git'
             }
+        }
+        stage('Install dependencies') {
+            steps {
+                sh 'npm install'
+            }
+        }
+        stage('Testing'){
+            steps {
+                sh 'npm run test'
+                junit 'junit.xml'
+            }
+        }
+        stage('Build artifact') {
+            steps {
+                script {
+                    def oldImageIds = sh(script: 'docker image ls --filter=reference=$IMAGE_NAME -q', returnStdout: true).trim()
+
+                    if (oldImageIds) {
+                        oldImageIds.split('\n').each { imageId ->
+                            def containerIds = sh(script: "docker container ls -a --filter ancestor=${imageId} -q", returnStdout: true).trim()
+                            
+                            if (containerIds) {
+                                containerIds.split('\n').each { containerId ->
+                                    sh "docker container rm -f ${containerId}"
+                                }
+                            }
+                            sh "docker image rm -f ${imageId}"
+                        }
+                    } else {
+                        echo 'No old images to remove'
+                    }
+                }
+                sh 'docker build . -t $IMAGE_NAME'
+            }
+        }
+        stage('Push artifact') {
+            steps {
+                sh 'docker login -u $DOCKER_CRED_USR -p $DOCKER_CRED_PSW'
+                sh 'docker image push $IMAGE_NAME:latest'
+            }
+        }
+        stage('deployment') {
+            steps {
+                sh 'docker run --name calculatorapp -d -p 3000:3000 $IMAGE_NAME:latest'
+            }
+        }
+    }
+    post{
+        cleanup{
+            cleanWs()
         }
     }
 }
