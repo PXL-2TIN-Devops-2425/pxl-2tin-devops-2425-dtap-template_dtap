@@ -43,4 +43,41 @@ Once that's done you can begin using DOCKER in your jenkinsfile.
 
 b)
 
+### Allowing communication between Jenkins & AWS EC2
 
+## Prerequisites
+
+1. Ensure you have a AWS account.
+2. Create the virtual machine
+   - from the home screen search for "EC2"
+     ![img.png](IMAGES/AWS_Start.png)
+   - Click on "instances" on the right hand side
+     ![img.png](IMAGES/AWS_instances.png)
+   - Click on "launch instances"
+     ![img.png](IMAGES/AWS_launch.png)
+   - Go through the follwoing steps:
+     - Naming the "EC2"
+       ![img.png](IMAGES/AWS_naming_ec2.png)
+     - Selecting the right "ami"
+       ![img.png](IMAGES/AWS_ami.png)
+     - Depending on if you have created a key, you may need to create one
+        ![img.png](IMAGES/AWS_pem_key.png)
+     - For the network settings you'll have to create a 
+       few things: "vpc, public subnet, route table, security group"
+       ![img.png](IMAGES/AWS_network.png)
+     - In the advanced section add this script
+       ![img.png](IMAGES/AWS_advanced_script.png)
+     - Before you create the machine make sure you note down the user.
+       ![img.png](IMAGES/AWS_user.png)
+     - Now create the EC2
+
+3. In jenkins' home folder add the directory ".aws"
+   ![img.png](IMAGES/Make_dir.png)
+4. put the aws credentials in .aws
+    ![img.png](IMAGES/AWS_creds.png)
+5. Put the private key of the "EC2" into jenkins' credential manager
+    ![img.png](IMAGES/AWS_jenkins_creds.png)
+6. First test your connection then you can move onto the production file
+    ![img.png](IMAGES/AWS_test_connection.png)
+    
+        
