@@ -15,22 +15,11 @@ pipeline {
             steps {
                 sshagent (credentials: ['ssh-agent']) {
                     script {
-                        def oldImageIds = sh(script: '$SSH docker image ls --filter=reference=$IMAGE_NAME -q', returnStdout: true).trim()
-    
-                        if (oldImageIds) {
-                            oldImageIds.split('\n').each { imageId ->
-                                def containerIds = sh(script: "$SSH docker container ls -a --filter ancestor=${imageId} -q", returnStdout: true).trim()
-                                
-                                if (containerIds) {
-                                    containerIds.split('\n').each { containerId ->
-                                        sh "$SSH docker container rm -f ${containerId}"
-                                    }
-                                }
-                                sh "$SSH docker image rm -f ${imageId}"
-                            }
-                        } else {
-                            echo 'No old images to remove'
-                        }
+                        try {
+                            sh '$SSH docker container rm -f calculatorapp'
+                        } catch (error) {
+                            echo "Container did not exist so was not removed."
+                        } 
                     }
                     sh '$SSH docker pull $IMAGE_NAME'
                 }
@@ -39,7 +28,7 @@ pipeline {
         stage('deploy prod'){
             steps {
                 sshagent (credentials: ['ssh-agent']) {
-                    sh '$SSH docker run -d -p 80:3000 $IMAGE_NAME'
+                    sh '$SSH docker run -d --name calculatorapp -p 80:3000 $IMAGE_NAME'
                 }
             }
         }
@@ -52,7 +41,8 @@ pipeline {
         }
     }
     post {
-        cleanup{
+        cleanup {
+            sh 'docker system prune -f'
             cleanWs()
         }
     }

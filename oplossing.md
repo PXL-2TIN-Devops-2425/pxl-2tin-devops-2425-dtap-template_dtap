@@ -4,5 +4,3 @@ opmaak met Markdown.
 a)
 
 sudo usermod -aG docker jenkins
-
-b)

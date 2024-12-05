@@ -32,21 +32,10 @@ pipeline {
         stage('Build artifact') {
             steps {
                 script {
-                    def oldImageIds = sh(script: 'docker image ls --filter=reference=$IMAGE_NAME -q', returnStdout: true).trim()
-
-                    if (oldImageIds) {
-                        oldImageIds.split('\n').each { imageId ->
-                            def containerIds = sh(script: "docker container ls -a --filter ancestor=${imageId} -q", returnStdout: true).trim()
-                            
-                            if (containerIds) {
-                                containerIds.split('\n').each { containerId ->
-                                    sh "docker container rm -f ${containerId}"
-                                }
-                            }
-                            sh "docker image rm -f ${imageId}"
-                        }
-                    } else {
-                        echo 'No old images to remove'
+                    try {
+                        sh 'docker container rm -f calculatorapp'
+                    } catch (error) {
+                        echo "Docker container did not exist so was not removed."
                     }
                 }
                 sh 'docker build . -t $IMAGE_NAME'
@@ -55,18 +44,18 @@ pipeline {
         stage('Push artifact') {
             steps {
                 sh 'docker login -u $DOCKER_CRED_USR -p $DOCKER_CRED_PSW'
-                sh 'docker image push $IMAGE_NAME:latest'
+                sh 'docker image push $IMAGE_NAME'
             }
         }
         stage('deployment') {
             steps {
-                sh 'docker run --name calculatorapp -d -p 3000:3000 $IMAGE_NAME:latest'
+                sh 'docker run --name calculatorapp -d -p 3000:3000 $IMAGE_NAME'
             }
         }
     }
     post{
         cleanup{
-            cleanWs()
+            sh 'docker system prune -f'
         }
     }
 }
