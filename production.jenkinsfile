@@ -31,12 +31,8 @@ pipeline {
                 sshagent(credentials: [SSH_CREDENTIALS]) {
                     script {
                         // Verwijder de bestaande container (indien aanwezig)
-                        sh """
-                            ssh ec2-user@${SERVER_IP} '
-                                if [ "$(docker ps -q -f name=calculator)" ]; then
-                                    docker stop calculator && docker rm calculator
-                                fi
-                            '
+                       sh """
+                            ssh ec2-user@${SERVER_IP} "if [ \$(docker ps -q -f name=calculator) ]; then docker stop calculator && docker rm calculator; fi"
                         """
                         // Start de nieuwe container op poort 80
                         sh "ssh ec2-user@${SERVER_IP} 'docker run -dt --name calculator -p 80:3000 ${DOCKER_IMAGE}'"
