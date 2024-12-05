@@ -1,10 +1,59 @@
 pipeline {
     agent any
+    environment {
+        IMAGE_NAME = "mathijsdewilde/calculatorapp"
+        IP = "44.201.168.208"
+        SSH = "ssh -o StrictHostKeyChecking=no ubuntu@$IP"
+    }
     stages {
         stage('dtap production') {
             steps {
                 echo "good luck..."
             }
+        }
+        stage('start prod'){
+            steps {
+                sshagent (credentials: ['ssh-agent']) {
+                    script {
+                        def oldImageIds = sh(script: '$SSH docker image ls --filter=reference=$IMAGE_NAME -q', returnStdout: true).trim()
+    
+                        if (oldImageIds) {
+                            oldImageIds.split('\n').each { imageId ->
+                                def containerIds = sh(script: "$SSH docker container ls -a --filter ancestor=${imageId} -q", returnStdout: true).trim()
+                                
+                                if (containerIds) {
+                                    containerIds.split('\n').each { containerId ->
+                                        sh "$SSH docker container rm -f ${containerId}"
+                                    }
+                                }
+                                sh "$SSH docker image rm -f ${imageId}"
+                            }
+                        } else {
+                            echo 'No old images to remove'
+                        }
+                    }
+                    sh '$SSH docker pull $IMAGE_NAME'
+                }
+            }
+        }
+        stage('deploy prod'){
+            steps {
+                sshagent (credentials: ['ssh-agent']) {
+                    sh '$SSH docker run -d -p 80:3000 $IMAGE_NAME'
+                }
+            }
+        }
+        stage("test prod"){
+            steps{
+                // Wait a few seconds for the container to spin up
+                sh 'sleep 5'
+                sh 'curl -I --connect-timeout 30 $IP'
+            }
+        }
+    }
+    post {
+        cleanup{
+            cleanWs()
         }
     }
 }
